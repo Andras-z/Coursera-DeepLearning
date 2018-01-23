@@ -85,9 +85,10 @@ def forward_propagation_for_predict(X, parameters):
     W1 = parameters['W1']
     W2 = parameters['W2']
 
-    Z1 = tf.matmul(W1,X)
+    Z1 = tf.nn.conv2d(X, W1, strides = [1,1,1,1], padding = 'SAME')
     A1 = tf.nn.relu(Z1)
-    Z2 = tf.matmul(W2,A1)
+    P1 = tf.nn.max_pool(A1, ksize = [1,8,8,1], strides = [1,8,8,1], padding = 'SAME')
+    Z2 = tf.nn.conv2d(P1, W2, strides = [1,1,1,1], padding = 'SAME')
     
     return Z2
 
@@ -100,7 +101,7 @@ def predict(X, parameters):
     params = {"W1": W1,
               "W2": W2}
     
-    x = tf.placeholder("float", [12288, 1])
+    x = tf.placeholder("float", [None, 64, 64, 3])
     
     z3 = forward_propagation_for_predict(x, params)
     p = tf.argmax(z3)
